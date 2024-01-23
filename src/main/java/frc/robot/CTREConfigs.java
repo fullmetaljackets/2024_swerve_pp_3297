@@ -122,6 +122,8 @@ public final class CTREConfigs {
         magnetSensorConfigs.AbsoluteSensorRange = AbsoluteSensorRangeValue.Unsigned_0To1;
         magnetSensorConfigs.SensorDirection = SwerveConstants.Swerve.canCoderInvert;
         magnetSensorConfigs.MagnetOffset = 0.0;
-        swerveCanCoderConfig.withMagnetSensor(magnetSensorConfigs);
+        // swerveCanCoderConfig.withMagnetSensor(magnetSensorConfigs);
+        swerveCanCoderConfig.MagnetSensor = magnetSensorConfigs;
+        
     }
 }
