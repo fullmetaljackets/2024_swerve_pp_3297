@@ -16,7 +16,10 @@ import frc.robot.constants.SwerveConstants;
 //import com.ctre.phoenix.sensors.CANCoder;
 
 import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.AbsoluteSensorRangeValue;
+import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.configs.CANcoderConfigurator;
+import com.ctre.phoenix6.configs.MagnetSensorConfigs;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfigurator;
 import com.ctre.phoenix6.controls.DutyCycleOut;
@@ -108,8 +111,19 @@ public class SwerveModule {
 //        angleEncoder.configFactoryDefault();
 //        angleEncoder.configAllSettings(CTREConfigs.swerveCanCoderConfig);
 
+    final CANcoderConfiguration swerveCanCoderConfig;
+    final MagnetSensorConfigs magnetSensorConfigs;
+    swerveCanCoderConfig = new CANcoderConfiguration();
+    magnetSensorConfigs = new MagnetSensorConfigs();
+
+        magnetSensorConfigs.AbsoluteSensorRange = AbsoluteSensorRangeValue.Unsigned_0To1;
+        magnetSensorConfigs.SensorDirection = SwerveConstants.Swerve.canCoderInvert;
+        magnetSensorConfigs.MagnetOffset = 0.0;
+        swerveCanCoderConfig.withMagnetSensor(magnetSensorConfigs);
+
         CANcoderConfigurator canCoderConfigurator = angleEncoder.getConfigurator();
-        canCoderConfigurator.apply(CTREConfigs.swerveCanCoderConfig);
+//        canCoderConfigurator.apply(CTREConfigs.swerveCanCoderConfig);
+        canCoderConfigurator.apply(swerveCanCoderConfig);
 
     }
 
