@@ -19,8 +19,13 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.AbsoluteSensorRangeValue;
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.configs.CANcoderConfigurator;
+import com.ctre.phoenix6.configs.ClosedLoopRampsConfigs;
+import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.MagnetSensorConfigs;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
+import com.ctre.phoenix6.configs.OpenLoopRampsConfigs;
+import com.ctre.phoenix6.configs.Slot0Configs;
+import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.configs.TalonFXConfigurator;
 import com.ctre.phoenix6.controls.DutyCycleOut;
 import com.ctre.phoenix6.controls.PositionDutyCycle;
@@ -111,10 +116,8 @@ public class SwerveModule {
 //        angleEncoder.configFactoryDefault();
 //        angleEncoder.configAllSettings(CTREConfigs.swerveCanCoderConfig);
 
-    final CANcoderConfiguration swerveCanCoderConfig;
-    final MagnetSensorConfigs magnetSensorConfigs;
-    swerveCanCoderConfig = new CANcoderConfiguration();
-    magnetSensorConfigs = new MagnetSensorConfigs();
+        CANcoderConfiguration swerveCanCoderConfig = new CANcoderConfiguration();
+        MagnetSensorConfigs magnetSensorConfigs = new MagnetSensorConfigs();
 
         magnetSensorConfigs.AbsoluteSensorRange = AbsoluteSensorRangeValue.Unsigned_0To1;
         magnetSensorConfigs.SensorDirection = SwerveConstants.Swerve.canCoderInvert;
@@ -132,10 +135,25 @@ public class SwerveModule {
         // mAngleMotor.configAllSettings(Robot.ctreConfigs.swerveAngleFXConfig);
         // mAngleMotor.setInverted(SwerveConstants.Swerve.angleMotorInvert);
         // mAngleMotor.setNeutralMode(SwerveConstants.Swerve.angleNeutralMode);
-        resetToAbsolute();
+        // resetToAbsolute();
 
         TalonFXConfigurator talonFXConfigurator = mAngleMotor.getConfigurator();
-        talonFXConfigurator.apply(CTREConfigs.swerveAngleFXConfig);
+        TalonFXConfiguration swerveAngleFXConfig = new TalonFXConfiguration();
+        CurrentLimitsConfigs currentLimitsConfigs = new CurrentLimitsConfigs();
+        Slot0Configs slot0Configs = new Slot0Configs();
+
+        currentLimitsConfigs.SupplyCurrentLimitEnable = SwerveConstants.Swerve.angleEnableCurrentLimit;
+        currentLimitsConfigs.SupplyCurrentLimit = SwerveConstants.Swerve.angleContinuousCurrentLimit;
+        currentLimitsConfigs.SupplyCurrentThreshold = SwerveConstants.Swerve.anglePeakCurrentLimit;
+        currentLimitsConfigs.SupplyTimeThreshold = SwerveConstants.Swerve.anglePeakCurrentDuration;
+        slot0Configs.withKP(SwerveConstants.Swerve.angleKP);
+        slot0Configs.withKI(SwerveConstants.Swerve.angleKI);
+        slot0Configs.withKD(SwerveConstants.Swerve.angleKD);
+        slot0Configs.withKV(SwerveConstants.Swerve.angleKF);
+        swerveAngleFXConfig.withCurrentLimits(currentLimitsConfigs);
+        swerveAngleFXConfig.withSlot0(slot0Configs);
+        talonFXConfigurator.apply(swerveAngleFXConfig);
+//        talonFXConfigurator.apply(CTREConfigs.swerveAngleFXConfig);
 
         // set invert to CW+ and apply config change
         MotorOutputConfigs motorConfigs = new MotorOutputConfigs();
@@ -155,7 +173,28 @@ public class SwerveModule {
         mDriveMotor.setPosition(0);
 
         TalonFXConfigurator talonFXConfigurator = mDriveMotor.getConfigurator();
-        talonFXConfigurator.apply(CTREConfigs.swerveDriveFXConfig);
+        TalonFXConfiguration swerveDriveFXConfig = new TalonFXConfiguration();
+        CurrentLimitsConfigs currentLimitsConfigs = new CurrentLimitsConfigs();
+        Slot0Configs slot0Configs = new Slot0Configs();
+        OpenLoopRampsConfigs openLoopRampsConfigs = new OpenLoopRampsConfigs();
+        ClosedLoopRampsConfigs closedLoopRampsConfigs = new ClosedLoopRampsConfigs();
+    
+        currentLimitsConfigs.SupplyCurrentLimitEnable = SwerveConstants.Swerve.driveEnableCurrentLimit;
+        currentLimitsConfigs.SupplyCurrentLimit = SwerveConstants.Swerve.driveContinuousCurrentLimit;
+        currentLimitsConfigs.SupplyCurrentThreshold = SwerveConstants.Swerve.drivePeakCurrentLimit;
+        currentLimitsConfigs.SupplyTimeThreshold = SwerveConstants.Swerve.drivePeakCurrentDuration;
+        slot0Configs.withKP(SwerveConstants.Swerve.driveKP);
+        slot0Configs.withKI(SwerveConstants.Swerve.driveKI);
+        slot0Configs.withKD(SwerveConstants.Swerve.driveKD);
+        slot0Configs.withKV(SwerveConstants.Swerve.driveKF);
+        openLoopRampsConfigs.withDutyCycleOpenLoopRampPeriod(SwerveConstants.Swerve.openLoopRamp);
+        closedLoopRampsConfigs.withDutyCycleClosedLoopRampPeriod(SwerveConstants.Swerve.closedLoopRamp);
+        swerveDriveFXConfig.withCurrentLimits(currentLimitsConfigs);
+        swerveDriveFXConfig.withSlot0(slot0Configs);
+        swerveDriveFXConfig.withOpenLoopRamps(openLoopRampsConfigs);
+        swerveDriveFXConfig.withClosedLoopRamps(closedLoopRampsConfigs);
+        talonFXConfigurator.apply(swerveDriveFXConfig);
+//        talonFXConfigurator.apply(CTREConfigs.swerveDriveFXConfig);
 
         // set invert to CW+ and apply config change
         MotorOutputConfigs motorConfigs = new MotorOutputConfigs();
